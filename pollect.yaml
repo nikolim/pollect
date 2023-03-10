@@ -1,0 +1,34 @@
+---
+tickTime: 120
+threads: 30
+writer:
+  type: Prometheus
+  port: 9101
+executors:
+
+  - collection: planetary
+    tickTime: 20
+    sources:
+      - type: VSphere
+        name: vmware
+        description: vSphere power and performance metrics
+        vsphere_endpoint: "deerls6vc301.siemens.net"
+        vsphere_username_env_var: VSPHERE_USERNAME
+        vsphere_password_env_var: VSPHERE_PASSWORD
+        vsphere_targets:
+          - 'deerls6vh339.siemens.net'
+          - 'deerls6vh334.siemens.net'
+          - 'deerls6vh333.siemens.net'
+        worker_threads: 8
+
+      - type: DellOpenManage
+        name: dell_openmanage
+        description: Dell OpenManage power metrics
+        ome_endpoint: "https://deerls6ome301.siemens.net"
+        ome_username_env_var: OME_USERNAME
+        ome_password_env_var: OME_PASSWORD
+        ome_targets:
+          - 'deerls6vh339.siemens.net'
+          - 'deerls6vh334.siemens.net'
+          - 'deerls6vh333.siemens.net'
+        worker_threads: 8
