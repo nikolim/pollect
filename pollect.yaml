@@ -15,7 +15,8 @@ executors:
         vsphere_endpoint: "deerls6vc301.siemens.net"
         vsphere_username_env_var: VSPHERE_USERNAME
         vsphere_password_env_var: VSPHERE_PASSWORD
-        vsphere_targets:
+        scrape_all_hosts: False
+        targets:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
           - 'deerls6vh333.siemens.net'
@@ -27,7 +28,8 @@ executors:
         ome_endpoint: "https://deerls6ome301.siemens.net"
         ome_username_env_var: OME_USERNAME
         ome_password_env_var: OME_PASSWORD
-        ome_targets:
+        scrape_all_hosts: False
+        targets:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
           - 'deerls6vh333.siemens.net'

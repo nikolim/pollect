@@ -21,6 +21,7 @@ class DellOpenManageSource(Source):
         ome_password = os.environ.get(ome_password_env)
         worker_threads = config.get("worker_threads", 8)
 
+        self.scrape_all_hosts = config.get("scrape_all_hosts", False)
         self.targets = config["targets"]
         self.ome = DellOpenManage(endpoint=ome_endpoint, username=ome_username, password=ome_password, logger=self.log,
                                   worker_threads=min(worker_threads, len(self.targets)))
@@ -28,7 +29,10 @@ class DellOpenManageSource(Source):
     def _probe(self):
 
         data = ValueSet(labels=["host"])
-        result = self.ome.query_hosts(self.targets)
+        if self.scrape_all_hosts:
+            result = self.ome.query_all_hosts()
+        else:
+            result = self.ome.query_hosts(self.targets)
 
         for host in result:
             if host is None:

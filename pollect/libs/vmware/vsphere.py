@@ -110,3 +110,16 @@ class Vsphere:
         futures = [self.executor.submit(self.query, device_name=host, request_ts=request_ts, counter_ids=counter_ids)
                    for host in hosts]
         return [future.result(timeout=15) for future in futures]
+
+    def query_all_hosts(self, request_ts: time = time(), counter_ids: list[int] = None) -> list[dict]:
+        """
+        Query performance metrics for all available hosts in parallel using a thread pool
+        :param request_ts:
+        :param counter_ids: optional list of counter ids
+        :return: list of dicts with the result for each host
+        """
+        container = self.content.viewManager.CreateContainerView(self.content.rootFolder, [vim.HostSystem], True)
+        host_names = []
+        for host in container.view:
+            host_names.append(host.name)
+        return self.query_hosts(hosts=host_names, request_ts=request_ts, counter_ids=counter_ids)

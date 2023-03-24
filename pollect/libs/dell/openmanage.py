@@ -106,3 +106,22 @@ class DellOpenManage:
         futures = [self.executor.submit(self.query, device_name=host, request_ts=request_ts)
                    for host in hosts]
         return [future.result(timeout=15) for future in futures]
+
+    def query_all_hosts(self, request_ts: time = time()) -> list[dict]:
+        """
+        Query performance metrics for all available hosts in parallel using a thread pool
+        :param request_ts:
+        :return: list of dicts with the result for each host
+        """
+        device_url = f"{self.endpoint}/api/DeviceService/Devices?top=500"
+        response = requests.get(
+            device_url, headers={'X-Auth-Token': self.session_key}, verify=False, timeout=10)
+
+        if response.status_code == 200:
+            hosts = response.json()["value"]
+            host_names = [host["DeviceName"] for host in hosts]
+        else:
+            self.logger.error(f"Failed to get hosts. Status code: {response.status_code}")
+            return []
+
+        self.query_hosts(hosts=host_names, request_ts=request_ts)

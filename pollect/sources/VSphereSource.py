@@ -21,6 +21,7 @@ class VSphereSource(Source):
         vsphere_password = os.environ.get(vsphere_password_env)
         worker_threads = config.get("worker_threads", 8)
 
+        self.scrape_all_hosts = config.get("scrape_all_hosts", False)
         self.targets = config["targets"]
         self.vsphere = Vsphere(endpoint=vsphere_endpoint, username=vsphere_username, password=vsphere_password,
                                logger=self.log, worker_threads=min(worker_threads, len(self.targets)))
@@ -28,7 +29,10 @@ class VSphereSource(Source):
     def _probe(self):
 
         data = ValueSet(labels=["type", "host", "vm"])
-        result = self.vsphere.query_hosts(self.targets)
+        if self.scrape_all_hosts:
+            result = self.vsphere.query_all_hosts()
+        else:
+            result = self.vsphere.query_hosts(self.targets)
 
         excluded_metrics = ["name", "vms"]
 
