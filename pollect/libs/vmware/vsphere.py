@@ -66,8 +66,13 @@ class Vsphere:
 
         result_stats = self.perf_manager.QueryStats(querySpec=[spec])
 
+        try:
+            sample_ts = datetime.timestamp(result_stats[0].sampleInfo[0].timestamp)
+        except IndexError:
+            sample_ts = -1
+
         result = {'request_ts': request_ts,
-                  'sample_ts': datetime.timestamp(result_stats[0].sampleInfo[0].timestamp)}
+                  'sample_ts': sample_ts}
         for _ in result_stats:
             for val in result_stats[0].value:
                 counter_key = list(self.counter_info.keys())[list(self.counter_info.values()).index(val.id.counterId)]

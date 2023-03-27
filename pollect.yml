@@ -20,7 +20,7 @@ executors:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
           - 'deerls6vh333.siemens.net'
-        worker_threads: 8
+        worker_threads: 32
 
       - type: DellOpenManage
         name: dell_openmanage
@@ -33,4 +33,4 @@ executors:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
           - 'deerls6vh333.siemens.net'
-        worker_threads: 8
+        worker_threads: 32

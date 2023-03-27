@@ -120,8 +120,11 @@ class DellOpenManage:
         if response.status_code == 200:
             hosts = response.json()["value"]
             host_names = [host["DeviceName"] for host in hosts]
+            # remove mp. from hostnames
+            host_names = [host_name.replace("mp.", ".") for host_name in host_names]
+
         else:
             self.logger.error(f"Failed to get hosts. Status code: {response.status_code}")
             return []
 
-        self.query_hosts(hosts=host_names, request_ts=request_ts)
+        return self.query_hosts(hosts=host_names, request_ts=request_ts)
