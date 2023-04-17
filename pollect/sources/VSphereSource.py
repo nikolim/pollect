@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from typing import Optional
 
+import requests
+
 from pollect.core.ValueSet import ValueSet, Value
 from pollect.sources.Source import Source
 from pollect.libs.vmware.vsphere import Vsphere
@@ -21,15 +23,28 @@ class VSphereSource(Source):
         vsphere_password = os.environ.get(vsphere_password_env)
         worker_threads = config.get("worker_threads", 8)
 
-        self.scrape_all_hosts = config.get("scrape_all_hosts", False)
-        self.targets = config["targets"]
+        self.scrape_policy = config.get("scrape_policy", "auto")
+
+        if self.scrape_policy == 'manual':
+            self.targets = config["targets"]
+        if self.scrape_policy == 'auto':
+            self.targets = self._get_targets()
+
+        self.energy_api_endpoint = config["energy_api_endpoint"]
         self.vsphere = Vsphere(endpoint=vsphere_endpoint, username=vsphere_username, password=vsphere_password,
                                logger=self.log, worker_threads=min(worker_threads, len(self.targets)))
+
+    def _get_targets(self):
+        resp = requests.get(self.energy_api_endpoint + "/get_hosts_to_monitor")
+        if resp.status_code != 200:
+            self.log.error("Energy API returned status code %s", resp.status_code)
+            return []
+        return resp.json()["hosts"]
 
     def _probe(self):
 
         data = ValueSet(labels=["type", "host", "vm"])
-        if self.scrape_all_hosts:
+        if self.scrape_policy == 'all':
             result = self.vsphere.query_all_hosts()
         else:
             result = self.vsphere.query_hosts(self.targets)

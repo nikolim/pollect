@@ -13,9 +13,14 @@ executors:
         name: vmware
         description: vSphere power and performance metrics
         vsphere_endpoint: "deerls6vc301.siemens.net"
+        energy_api_endpoint: "https://alm-energy-service.dema-platform.siemens.cloud/"
         vsphere_username_env_var: VSPHERE_USERNAME
         vsphere_password_env_var: VSPHERE_PASSWORD
-        scrape_all_hosts: False
+        # 'auto': use energy endpoint to determine which hosts to scrape
+        # 'manual': use targets list to determine which hosts to scrape
+        # 'all': scrape all hosts
+        scrape_policy: 'auto'
+        # only used if scrape_policy is 'manual'
         targets:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
@@ -26,9 +31,14 @@ executors:
         name: dell_openmanage
         description: Dell OpenManage power metrics
         ome_endpoint: "https://deerls6ome301.siemens.net"
+        energy_api_endpoint: "https://alm-energy-service.dema-platform.siemens.cloud/"
         ome_username_env_var: OME_USERNAME
         ome_password_env_var: OME_PASSWORD
-        scrape_all_hosts: False
+        # 'auto': use energy endpoint to determine which hosts to scrape
+        # 'manual': use targets list to determine which hosts to scrape
+        # 'all': scrape all hosts
+        scrape_policy: 'auto'
+        # only used if scrape_policy is 'manual'
         targets:
           - 'deerls6vh339.siemens.net'
           - 'deerls6vh334.siemens.net'
