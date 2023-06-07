@@ -16,12 +16,12 @@ class VSphereSource(Source):
     def __init__(self, config):
         super().__init__(config)
 
-        vsphere_endpoint = config['vsphere_endpoint']
+        self.vsphere_endpoint = config['vsphere_endpoint']
         vsphere_username_env = config['vsphere_username_env_var']
-        vsphere_username = os.environ.get(vsphere_username_env)
+        self.vsphere_username = os.environ.get(vsphere_username_env)
         vsphere_password_env = config['vsphere_password_env_var']
-        vsphere_password = os.environ.get(vsphere_password_env)
-        worker_threads = config.get("worker_threads", 8)
+        self.vsphere_password = os.environ.get(vsphere_password_env)
+        self.worker_threads = config.get("worker_threads", 8)
 
         self.scrape_policy = config.get("scrape_policy", "auto")
 
@@ -31,8 +31,10 @@ class VSphereSource(Source):
             self.targets = self._get_targets()
 
         self.energy_api_endpoint = config["energy_api_endpoint"]
-        self.vsphere = Vsphere(endpoint=vsphere_endpoint, username=vsphere_username, password=vsphere_password,
-                               logger=self.log, worker_threads=min(worker_threads, len(self.targets)))
+
+        self.vsphere = Vsphere(endpoint=self.vsphere_endpoint, username=self.vsphere_username,
+                               password=self.vsphere_password,
+                               logger=self.log, worker_threads=min(self.worker_threads, len(self.targets)))
 
     def _get_targets(self):
         resp = requests.get(self.energy_api_endpoint + "/get_hosts_to_monitor")
@@ -42,6 +44,11 @@ class VSphereSource(Source):
         return resp.json()["hosts"]
 
     def _probe(self):
+
+        if not self.vsphere.is_connected():
+            self.vsphere = Vsphere(endpoint=self.vsphere_endpoint, username=self.vsphere_username,
+                                   password=self.vsphere_password,
+                                   logger=self.log, worker_threads=min(self.worker_threads, len(self.targets)))
 
         data = ValueSet(labels=["type", "host", "vm"])
         if self.scrape_policy == 'all':

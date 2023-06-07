@@ -1,5 +1,5 @@
 import logging
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait, FIRST_EXCEPTION
 from time import time
 from datetime import datetime
 
@@ -23,6 +23,16 @@ class Vsphere:
         self.perf_manager = self.content.perfManager
         self.counter_info = self.create_counter_info_dict()
         self.executor = ThreadPoolExecutor(max_workers=worker_threads)
+
+    def is_connected(self):
+        """
+        Check if the connection is still alive
+        """
+        try:
+            self.si.CurrentTime()
+            return True
+        except:
+            return False
 
     def create_counter_info_dict(self) -> dict:
         """
@@ -114,7 +124,12 @@ class Vsphere:
         """
         futures = [self.executor.submit(self.query, device_name=host, request_ts=request_ts, counter_ids=counter_ids)
                    for host in hosts]
-        return [future.result(timeout=15) for future in futures]
+
+        result = []
+        done, futures = wait(futures, timeout=60, return_when=FIRST_EXCEPTION)
+        for future in done:
+            result.append(future.result())
+        return result
 
     def query_all_hosts(self, request_ts: time = time(), counter_ids: list[int] = None) -> list[dict]:
         """
