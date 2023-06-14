@@ -1,0 +1,28 @@
+---
+tickTime: 120
+threads: 30
+writer:
+  type: Prometheus
+  port: 9101
+executors:
+
+  - collection: planetary
+    tickTime: 120
+    sources:
+      - type: VSphere
+        name: vmware
+        description: vSphere power and performance metrics
+        vsphere_endpoint: "dekher3vc301.siemens.net"
+        energy_api_endpoint: "https://alm-energy-service.dema-platform.siemens.cloud/"
+        vsphere_username_env_var: VSPHERE_USERNAME
+        vsphere_password_env_var: VSPHERE_PASSWORD
+        # 'auto': use energy endpoint to determine which hosts to scrape
+        # 'manual': use targets list to determine which hosts to scrape
+        # 'all': scrape all hosts
+        scrape_policy: 'all'
+        # only used if scrape_policy is 'manual'
+        targets:
+          - 'deerls6vh339.siemens.net'
+          - 'deerls6vh334.siemens.net'
+          - 'deerls6vh333.siemens.net'
+        worker_threads: 32

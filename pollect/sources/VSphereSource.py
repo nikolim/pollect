@@ -27,14 +27,14 @@ class VSphereSource(Source):
 
         if self.scrape_policy == 'manual':
             self.targets = config["targets"]
-        if self.scrape_policy == 'auto':
+        elif self.scrape_policy == 'auto':
             self.targets = self._get_targets()
 
         self.energy_api_endpoint = config["energy_api_endpoint"]
 
         self.vsphere = Vsphere(endpoint=self.vsphere_endpoint, username=self.vsphere_username,
                                password=self.vsphere_password,
-                               logger=self.log, worker_threads=min(self.worker_threads, len(self.targets)))
+                               logger=self.log, worker_threads=self.worker_threads)
 
     def _get_targets(self):
         resp = requests.get(self.energy_api_endpoint + "/get_hosts_to_monitor")
