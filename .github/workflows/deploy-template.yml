@@ -31,9 +31,9 @@ steps:
 
   - name: Terminate old pollect instance
     run: |
-      systemctl stop pollect
+      systemctl stop pollect.service
   - name: Run pollect
     run: |
       systemctl daemon-reload
-      systemctl enable pollect
-      systemctl start pollect
+      systemctl enable pollect.service
+      systemctl start pollect.service
