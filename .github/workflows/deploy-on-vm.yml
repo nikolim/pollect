@@ -1,0 +1,33 @@
+name: Deploy pollect on VMs
+
+on:
+  push:
+    branches: [ 'main', 'sources' ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy-erlangen:
+    runs-on: local-planetary-exp-erl
+    steps:
+      - name: Use deploy template
+        uses: ./deploy-template.yml
+        with:
+          # specify the config file in the planetary-configs folder
+          POLLECT_CONFIG_FILE: 'erl-config.yml'
+          VSPHERE_USERNAME: ${{ secrets.VSPHERE_USERNAME_ERL }}
+          VSPHERE_PASSWORD: ${{ secrets.VSPHERE_PASSWORD_ERL }}
+
+  deploy-karlsruhe:
+    runs-on: local-planetary-exp-khe
+
+    steps:
+      - name: Use deploy template
+        uses: ./deploy-template.yml
+        with:
+          # specify the config file in the planetary-configs folder
+          POLLECT_CONFIG_FILE: 'khe-config.yml'
+          VSPHERE_USERNAME: ${{ secrets.VSPHERE_USERNAME_KHE }}
+          VSPHERE_PASSWORD: ${{ secrets.VSPHERE_PASSWORD_KHE }}
+
