@@ -12,8 +12,13 @@ jobs:
     runs-on: ${{ matrix.planetary_exp }}
     strategy:
       matrix:
-        planetary_exp: ['local-planetary-exp-erl', 'local-planetary-exp-khe']
-        config_file: ['erl-config.yml', 'khe-config.yml']
+        include:
+          - planetary_exp: 'local-planetary-exp-erl'
+            config_file: 'erl-config.yml'
+            location: 'ERL'
+          - planetary_exp: 'local-planetary-exp-khe'
+            config_file: 'khe-config.yml'
+            location: 'KHE'
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -26,15 +31,18 @@ jobs:
           pip install -r requirements.txt
           pip install .
       - name: Create Service Unit File
+        env:
+          VSPHERE_USERNAME: ${{ secrets[format('VSPHERE_USERNAME_{0}', matrix.location)] }}
+          VSPHERE_PASSWORD: ${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}
         run: |
-          cat << EOF > /etc/systemd/system/pollect.service
+          sudo cat << EOF > /etc/systemd/system/pollect.service
           [Unit]
           Description=Pollect service
           After=network.target
 
           [Service]
-          Environment="VSPHERE_USERNAME=${{ secrets.VSPHERE_USERNAME }}"
-          Environment="VSPHERE_PASSWORD=${{ secrets.VSPHERE_PASSWORD }}"
+          Environment="VSPHERE_USERNAME=${VSPHERE_USERNAME}"
+          Environment="VSPHERE_PASSWORD=${VSPHERE_PASSWORD}"
           ExecStart=/usr/bin/python3 -m pollect --config planetary-configs/${{ matrix.config_file }}"
           WorkingDirectory=/opt/actions-runner/planetary-pollect/planetary-pollect/
           Restart=always
@@ -42,19 +50,15 @@ jobs:
           [Install]
           WantedBy=multi-user.target
           EOF
-          
       - name: Terminate old pollect instance
         run: |
-          systemctl stop pollect.service
-          
+          sudo systemctl stop pollect.service
       - name: Run pollect
         run: |
-          systemctl daemon-reload
-          systemctl enable pollect.service
-          systemctl start pollect.service
-          
-      - name: Check if pollect exposes metrics
+          sudo systemctl daemon-reload
+          sudo systemctl enable pollect.service
+          sudo systemctl start pollect.service
+      - name: Check metrics
         run: |
           sleep 10
-          curl -f localhost:9101/metrics    
-      
+          curl -f localhost:9101/metrics
