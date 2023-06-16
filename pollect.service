@@ -3,10 +3,8 @@ Description=Pollect service
 After=network.target
 
 [Service]
-Environment="VSPHERE_USERNAME=${VSPHERE_USERNAME}"
-Environment="VSPHERE_PASSWORD=${VSPHERE_PASSWORD}"
-Environment="POLLECT_CONFIG_FILE=${POLLECT_CONFIG_FILE}"
-ExecStart=/usr/bin/python3 -m pollect --config planetary-configs/${POLLECT_CONFIG_FILE}
+EnvironmentFile=~/.env
+ExecStart=/usr/bin/python3 -m pollect --config planetary-configs/$POLLECT_CONFIG_FILE
 WorkingDirectory=/opt/actions-runner/planetary-pollect/planetary-pollect/
 Restart=always
 
