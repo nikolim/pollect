@@ -34,22 +34,9 @@ jobs:
         env:
           VSPHERE_USERNAME: ${{ secrets[format('VSPHERE_USERNAME_{0}', matrix.location)] }}
           VSPHERE_PASSWORD: ${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}
+          POLLECT_CONFIG_FILE: ${{ matrix.config_file }}
         run: |
-          sudo cat << EOF > /etc/systemd/system/pollect.service
-          [Unit]
-          Description=Pollect service
-          After=network.target
-
-          [Service]
-          Environment="VSPHERE_USERNAME=${VSPHERE_USERNAME}"
-          Environment="VSPHERE_PASSWORD=${VSPHERE_PASSWORD}"
-          ExecStart=/usr/bin/python3 -m pollect --config planetary-configs/${{ matrix.config_file }}"
-          WorkingDirectory=/opt/actions-runner/planetary-pollect/planetary-pollect/
-          Restart=always
-
-          [Install]
-          WantedBy=multi-user.target
-          EOF
+          sudo cp pollect.service /etc/systemd/system/
       - name: Terminate old pollect instance
         run: |
           fuser -k 9101/tcp
