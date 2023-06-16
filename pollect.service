@@ -5,7 +5,7 @@ After=network.target
 [Service]
 EnvironmentFile=/etc/environment_vars
 ExecStart=/usr/bin/python3 -m pollect --config planetary-configs/$POLLECT_CONFIG_FILE
-WorkingDirectory=/opt/actions-runner/planetary-pollect/planetary-pollect/
+WorkingDirectory=/opt/actions-runner/_work/planetary-pollect/planetary-pollect/
 Restart=always
 
 [Install]
