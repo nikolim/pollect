@@ -37,6 +37,10 @@ jobs:
           echo "VSPHERE_PASSWORD=${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}" | sudo tee -a /etc/environment_vars
           echo "POLLECT_CONFIG_FILE=${{ matrix.config_file }}" | sudo tee -a /etc/environment_vars
 
+      - name: Make start script executable
+        run: |
+          sudo chmod +x start.sh
+
       - name: Create Service Unit File
         run: |
           sudo cp pollect.service /etc/systemd/system/
@@ -44,12 +48,14 @@ jobs:
       - name: Terminate old pollect instance
         run: |
           sudo systemctl stop pollect.service
-      - name: Run pollect
+
+      - name: Start pollect service
         run: |
           sudo systemctl daemon-reload
           sudo systemctl enable pollect.service
           sudo systemctl start pollect.service
-      - name: Check metrics
+
+      - name: Check metrics after 10 seconds
         run: |
           sleep 10
           curl -f localhost:9101/metrics
