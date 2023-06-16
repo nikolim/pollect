@@ -52,6 +52,7 @@ jobs:
           EOF
       - name: Terminate old pollect instance
         run: |
+          fuser -k 9101/tcp
           sudo systemctl stop pollect.service
       - name: Run pollect
         run: |
