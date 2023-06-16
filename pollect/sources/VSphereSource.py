@@ -23,14 +23,13 @@ class VSphereSource(Source):
         self.vsphere_password = os.environ.get(vsphere_password_env)
         self.worker_threads = config.get("worker_threads", 8)
 
-        self.scrape_policy = config.get("scrape_policy", "auto")
+        self.scrape_policy = config.get("scrape_policy", "all")
+        self.energy_api_endpoint = config["energy_api_endpoint"]
 
         if self.scrape_policy == 'manual':
             self.targets = config["targets"]
         elif self.scrape_policy == 'auto':
             self.targets = self._get_targets()
-
-        self.energy_api_endpoint = config["energy_api_endpoint"]
 
         self.vsphere = Vsphere(endpoint=self.vsphere_endpoint, username=self.vsphere_username,
                                password=self.vsphere_password,
