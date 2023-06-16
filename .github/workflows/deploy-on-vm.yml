@@ -33,9 +33,9 @@ jobs:
 
       - name: Create env file
         run: |
-          echo "VSPHERE_USERNAME=${{ secrets[format('VSPHERE_USERNAME_{0}', matrix.location)] }}" >> ~/.env
-          echo "VSPHERE_PASSWORD=${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}" >> ~/.env
-          echo "POLLECT_CONFIG_FILE=${{ matrix.config_file }}" >> ~/.env
+          echo "VSPHERE_USERNAME=${{ secrets[format('VSPHERE_USERNAME_{0}', matrix.location)] }}" | sudo tee /etc/environment_vars
+          echo "VSPHERE_PASSWORD=${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}" | sudo tee -a /etc/environment_vars
+          echo "POLLECT_CONFIG_FILE=${{ matrix.config_file }}" | sudo tee -a /etc/environment_vars
 
       - name: Create Service Unit File
         run: |
