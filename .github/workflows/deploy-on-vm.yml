@@ -20,6 +20,10 @@ jobs:
             config_file: 'khe-config.yml'
             location: 'KHE'
     steps:
+      - name: Remove old repo clone
+        run: |
+          sudo rm -rf /opt/actions-runner/_work/planetary-pollect/
+        
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v2
