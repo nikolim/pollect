@@ -35,7 +35,7 @@ jobs:
           VSPHERE_USERNAME: ${{ secrets[format('VSPHERE_USERNAME_{0}', matrix.location)] }}
           VSPHERE_PASSWORD: ${{ secrets[format('VSPHERE_PASSWORD_{0}', matrix.location)] }}
         run: |
-          sudo cat << EOF > /etc/systemd/system/pollect.service
+          cat << EOF > /etc/systemd/system/pollect.service
           [Unit]
           Description=Pollect service
           After=network.target
@@ -53,12 +53,12 @@ jobs:
       - name: Terminate old pollect instance
         run: |
           fuser -k 9101/tcp
-          sudo systemctl stop pollect.service
+          systemctl stop pollect.service
       - name: Run pollect
         run: |
-          sudo systemctl daemon-reload
-          sudo systemctl enable pollect.service
-          sudo systemctl start pollect.service
+          systemctl daemon-reload
+          systemctl enable pollect.service
+          systemctl start pollect.service
       - name: Check metrics
         run: |
           sleep 10
